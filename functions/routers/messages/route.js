@@ -28,16 +28,44 @@ router.route(endPoint)
     }
     res.json({ messages })
   })
-  .post((req, res) => {
+  .post(async (req, res) => {
+    const { name, body } = req.body
+    try {
+      const docRef = await db.collection('messages').add({
+        name, body
+      })
 
+      const docSnapshot = await docRef.get()
+      const createdMessage = {
+        id: docSnapshot.id,
+        ...docSnapshot.data()
+      }
+      res.json({ createdMessage })
+    } catch (error) {
+      console.error(error)
+    }
   })
 
 router.route(`${endPoint}/:id`)
-  .put((req, res) => {
-
+  .put(async (req, res) => {
+    const { id } = req.params
+    const { name, body } = req.body
+    const newData = { name, body }
+    try {
+      await db.collection('messages').doc(id).update(newData)
+      res.json({ message: `updated! ID: ${id}` })
+    } catch (error) {
+      console.error(error)
+    }
   })
-  .delete((req, res) => {
-
+  .delete(async (req, res) => {
+    const { id } = req.params
+    try {
+      await db.collection('messages').doc(id).delete()
+      res.json({ message: `deleted! ID: ${id}` })
+    } catch (error) {
+      console.error(error)
+    }
   })
 
 module.exports = router
