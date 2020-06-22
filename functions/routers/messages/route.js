@@ -13,7 +13,7 @@ const endPoint = '/messages'
 const db = admin.firestore()
 
 router.route(endPoint)
-  .get((req, res) => {
+  .get(async (req, res) => {
     const messages = []
     try {
       const querySnapshot = await db.collection('messages').get()
